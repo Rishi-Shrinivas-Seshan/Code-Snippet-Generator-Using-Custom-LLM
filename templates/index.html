@@ -1,0 +1,125 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Snippet Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .chat-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        .chat-history {
+            border-right: 1px solid #ddd;
+            overflow-y: scroll;
+        }
+        .chat-input {
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            overflow-y: scroll;
+        }
+        .input-field {
+            width: calc(100% - 20px);
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .send-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            max-width: 0;
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Code Snippet Generator</div>
+        
+        <div class="chat-input">
+            <form action="/" method="post">
+                <textarea id="description" name="description" class="input-field" placeholder="Describe your required code here..." rows="4" cols="50"></textarea><br><br>
+                <input type="submit" class="send-button" value="Generate Code Snippet">
+            </form>
+        </div>
+        {% if snippet %}
+            <div class="chat-header">Generated Code Snippet :</div>
+            <div class="chat-input">
+                <pre>{{ snippet }}</pre>
+                <form action="/feedback" method="post">
+                    <input type="hidden" name="snippet_index" value="{{ code_snippets|length - 1 }}">
+                    <textarea id="feedback" name="feedback" class="input-field" placeholder="Provide your feedback here..." rows="4" cols="50"></textarea><br><br>
+                    <input type="submit" class="send-button" value="Submit Feedback">
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="chat-history" id="chat-history">
+        <table id="history-table">
+            <div class="chat-header">Previously Generated Code Snippets</div>
+            <tbody>
+                {% set counter = namespace(value=0) %}
+                {% for snippet in code_snippets %}
+                <tr>
+                    <td style='width:4%'>{{counter.value + 1}}</td>
+
+                    <td style='width:38%'>{{ code_description[counter.value] }}</td>
+
+                    <td style='width:38%'>{{ snippet }}</td>
+
+                    <td style='width:10%'>
+                        <form action="/view" method="post">
+                            <input type="hidden" name="snippet_index" value="{{ counter.value }}">
+                            <input type="submit" class="send-button" value="View">
+                        </form> 
+                    </td>
+                    
+                    <td style='width:10%'>
+                        <form action="/delete" method="post">
+                            <input type="hidden" name="snippet_index" value="{{ counter.value }}">
+                            <input type="submit" class="send-button" value="Delete">
+                        </form>
+                    </td>
+                    {% set counter.value = counter.value + 1 %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
